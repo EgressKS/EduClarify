@@ -1,0 +1,225 @@
+/* global.css — cleaned and combined
+   - Keep @import font first (so Tailwind utilities can inherit)
+   - Tailwind directives next
+   - CSS variables in :root, .dark overrides below
+*/
+
+/* Google font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Tailwind layers (do not replace order) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* ---------- CSS VARIABLES (theme) ---------- */
+/* Primary definition (dark-oriented palette using OKLCH) */
+:root {
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.5 0.223 265);
+  --primary-foreground: oklch(0.95 0 0);
+  --secondary: oklch(0.22 0 0);
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: oklch(0.35 0 0);
+  --muted-foreground: oklch(0.7 0 0);
+  --accent: oklch(0.55 0.25 265);
+  --accent-foreground: oklch(0.95 0 0);
+  --destructive: oklch(0.5 0.2 25);
+  --destructive-foreground: oklch(0.95 0 0);
+  --border: oklch(0.25 0 0);
+  --input: oklch(0.22 0 0);
+  --ring: oklch(0.55 0.25 265);
+  --chart-1: oklch(0.55 0.25 265);
+  --chart-2: oklch(0.65 0.2 180);
+  --chart-3: oklch(0.7 0.2 90);
+  --chart-4: oklch(0.6 0.25 45);
+  --chart-5: oklch(0.5 0.2 320);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.18 0 0);
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.55 0.25 265);
+  --sidebar-primary-foreground: oklch(0.95 0 0);
+  --sidebar-accent: oklch(0.3 0 0);
+  --sidebar-accent-foreground: oklch(0.95 0 0);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: oklch(0.55 0.25 265);
+
+  /* Fallbacks (for older browsers that do not support OKLCH) */
+  --background-fallback: #1e293b; /* slate-800 */
+  --foreground-fallback: #f8fafc; /* slate-50 */
+  --border-fallback: #334155; /* slate-700 */
+}
+
+/* Respect prefers-color-scheme: light for users who use system light mode.
+   This provides a light fallback variant that overrides a few values.
+   Keep .dark class-based toggling for explicit theme toggles in JS. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #ffffff;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --border: #e6edf3;
+    --input: #f8fafc;
+    --muted: #94a3b8;
+  }
+}
+
+/* .dark class will override variables — useful for manual toggles */
+.dark {
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(0.95 0 0);
+  --border: oklch(0.25 0 0);
+  --input: oklch(0.22 0 0);
+}
+
+/* ---------- Base typographic & global rules ---------- */
+:root,
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--foreground, var(--foreground-fallback));
+  background: var(--background, var(--background-fallback));
+}
+
+/* Smooth transitions for interactive elements */
+*,
+*::before,
+*::after {
+  /* Use a short list of animatable properties to reduce layout cost */
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity, filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  box-sizing: border-box;
+}
+
+/* Accessibility focus-visible */
+:where(button, input, textarea, a):focus-visible {
+  outline: 2px solid var(--ring, #2563eb);
+  outline-offset: 2px;
+  /* keep focus ring thickness stable across browsers */
+}
+
+/* Lists */
+li {
+  list-style-type: square;
+  margin-left: 30px;
+  padding: 2px 0;
+}
+
+/* Custom scrollbar (modern browsers) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.04);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.16);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.24);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.16) transparent;
+}
+
+/* Utility helper: visually hide scrollbars while retaining scrollability
+   Use `.hide-scrollbar` class where needed (keeps native behavior if not desired globally) */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* ---------- Animations ---------- */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scaleIn 0.4s ease-out both;
+}
+
+/* ---------- Tailwind base layer overrides ---------- */
+@layer base {
+  /* Apply border color and a default outline ring using CSS variables */
+  :root, * {
+    /* A utility for components that read these variables */
+    --border-color: var(--border, var(--border-fallback));
+    --ring-color: var(--ring, #2563eb);
+  }
+
+  html, body {
+    @apply min-h-screen;
+    /* Prevent horizontal scroll caused by some children */
+    overflow-x: hidden;
+    background: var(--background, var(--background-fallback));
+    color: var(--foreground, var(--foreground-fallback));
+  }
+
+  /* Optional: subtle default card styling you can use with .card */
+  .card {
+    background: var(--card, var(--background-fallback));
+    color: var(--card-foreground, var(--foreground-fallback));
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+  }
+
+  /* Keep accessible focus for interactive elements */
+  button, a, input, textarea, select {
+    outline-color: var(--ring, #2563eb);
+  }
+}
+
+/* ---------- Small helpers ---------- */
+/* utility to visually center content */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* small radius utilities (in case you want to use them in CSS directly) */
+.radius-sm { border-radius: calc(var(--radius) - 4px); }
+.radius-md { border-radius: calc(var(--radius) - 2px); }
+.radius-lg { border-radius: var(--radius); }
+.radius-xl { border-radius: calc(var(--radius) + 4px); }
