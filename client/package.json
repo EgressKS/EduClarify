@@ -25,7 +25,8 @@
     "react-dom": "^19.1.0",
     "react-katex": "^3.0.1",
     "react-markdown": "^9.0.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "typewriter-effect": "^2.22.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^15.3.1",
