@@ -7,7 +7,7 @@ import { ProfileAvatar } from "./profile-avatar"
 
 interface FooterProps {
   isLoggedIn?: boolean
-  user?: { name: string; email: string } | null
+  user?: { id?: string; name: string; email: string } | null
 }
 
 export function Footer({ isLoggedIn = false, user = null }: FooterProps) {

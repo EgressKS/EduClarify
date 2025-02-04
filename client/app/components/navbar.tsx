@@ -1,26 +1,25 @@
 "use client"
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, LogOut, Settings, BarChart3 } from "lucide-react"
+import { Menu, X, LogOut, Settings, BarChart3, User } from "lucide-react"
 import { ProfileAvatar } from "./profile-avatar"
 
 interface NavbarProps {
   isLoggedIn: boolean
-  user: { name: string; email: string } | null
+  user: { id?: string; name: string; email: string } | null
   onLogout: () => void
-  onLogin: (name: string, email: string) => void
   onShowSignIn?: () => void
   onShowSignUp?: () => void
 }
 
-export function Navbar({ isLoggedIn, user, onLogout, onLogin, onShowSignIn, onShowSignUp }: NavbarProps) {
+export function Navbar({ isLoggedIn, user, onLogout, onShowSignIn, onShowSignUp }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
 
   return (
     <>
       <nav className="sticky top-0 z-50 border-b border-slate-700/30 bg-slate-900/80 backdrop-blur-lg">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-6 sm:px-6 lg:px-8 ">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center space-x-3">
@@ -38,45 +37,72 @@ export function Navbar({ isLoggedIn, user, onLogout, onLogin, onShowSignIn, onSh
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="flex items-center gap-2 hover:bg-slate-800/50 px-3 py-2 rounded-lg transition-colors"
+                    className="flex items-center gap-2 hover:bg-slate-800/50 p-1 rounded-full transition-all duration-200 ring-0 hover:ring-2 hover:ring-purple-500"
                   >
-                    <ProfileAvatar name={user.name} size="sm" />
+                    <ProfileAvatar name={user.name} size="lg" />
                   </button>
                   {showProfileMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700/50 rounded-lg shadow-xl overflow-hidden">
-                      <div className="px-4 py-3 border-b border-slate-700/30">
-                        <p className="text-sm font-medium text-white">{user.name}</p>
-                        <p className="text-xs text-slate-400">{user.email}</p>
+                    <>
+                      {/* Backdrop to close menu */}
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setShowProfileMenu(false)}
+                      />
+                      <div className="absolute right-0 mt-3 w-56 bg-slate-800/95 backdrop-blur-xl border border-slate-700/50 rounded-xl shadow-2xl shadow-black/20 overflow-hidden z-50 animate-dropdown">
+                        {/* User Info Header */}
+                        <div className="px-4 py-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-b border-slate-700/30">
+                          <div className="flex items-center gap-3">
+                            <ProfileAvatar name={user.name} size="md" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+                              <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Menu Items */}
+                        <div className="py-2">
+                          <Link
+                            href="/solver"
+                            onClick={() => setShowProfileMenu(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-blue-500/10 hover:text-blue-400 transition-colors"
+                          >
+                            <BarChart3 size={18} className="text-slate-400" />
+                            <span>Start Learning</span>
+                          </Link>
+                          <Link
+                            href="/profile"
+                            onClick={() => setShowProfileMenu(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-slate-700/50 transition-colors"
+                          >
+                            <User size={18} className="text-slate-400" />
+                            <span>Profile</span>
+                          </Link>
+                          <Link
+                            href="/settings"
+                            onClick={() => setShowProfileMenu(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-slate-700/50 transition-colors"
+                          >
+                            <Settings size={18} className="text-slate-400" />
+                            <span>Settings</span>
+                          </Link>
+                        </div>
+                        
+                        {/* Logout */}
+                        <div className="border-t border-slate-700/30 py-2">
+                          <button
+                            onClick={() => {
+                              onLogout()
+                              setShowProfileMenu(false)
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                          >
+                            <LogOut size={18} />
+                            <span>Logout</span>
+                          </button>
+                        </div>
                       </div>
-                      <button
-                        onClick={() => {
-                          setShowProfileMenu(false)
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
-                      >
-                        <BarChart3 size={16} />
-                        Dashboard
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowProfileMenu(false)
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
-                      >
-                        <Settings size={16} />
-                        Settings
-                      </button>
-                      <button
-                        onClick={() => {
-                          onLogout()
-                          setShowProfileMenu(false)
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors border-t border-slate-700/30"
-                      >
-                        <LogOut size={16} />
-                        Logout
-                      </button>
-                    </div>
+                    </>
                   )}
                 </div>
               ) : (
@@ -94,14 +120,6 @@ export function Navbar({ isLoggedIn, user, onLogout, onLogin, onShowSignIn, onSh
                     Sign Up
                   </button>
                 </>
-              )}
-              {isLoggedIn && (
-                <Link
-                  href="/solver"
-                  className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 font-medium text-sm"
-                >
-                  Start Learning
-                </Link>
               )}
             </div>
 
@@ -123,24 +141,26 @@ export function Navbar({ isLoggedIn, user, onLogout, onLogin, onShowSignIn, onSh
                     <p className="text-sm font-medium text-white">{user.name}</p>
                     <p className="text-xs text-slate-400">{user.email}</p>
                   </div>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="w-full text-left px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-                  >
-                    Dashboard
-                  </button>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="w-full text-left px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-                  >
-                    Settings
-                  </button>
                   <Link
-                    href="#"
+                    href="/solver"
                     onClick={() => setIsOpen(false)}
-                    className="block px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:shadow-emerald-500/30 transition-all text-sm font-medium"
+                    className="block px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
                   >
                     Start Learning
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
+                  >
+                    Settings
                   </Link>
                   <button
                     onClick={() => {

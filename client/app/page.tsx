@@ -1,13 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { apiClient } from "@/app/lib/http"
 import { Navbar } from "@/app/components/navbar"
 import { Footer } from "@/app/components/footer"
 
 export default function LandingPage() {
+  const router = useRouter()
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [user, setUser] = useState<{ id?: string; name: string; email: string } | null>(null)
   const [isHovered, setIsHovered] = useState(false)
   
   // Auth modal states
@@ -26,25 +29,34 @@ export default function LandingPage() {
 
   useEffect(() => {
     setIsLoaded(true)
+    // Check for existing auth token and user data
+    const token = localStorage.getItem("token")
     const savedUser = localStorage.getItem("user")
-    if (savedUser) {
-      const userData = JSON.parse(savedUser)
-      setUser(userData)
-      setIsLoggedIn(true)
+    if (token && savedUser) {
+      try {
+        const userData = JSON.parse(savedUser)
+        setUser(userData)
+        setIsLoggedIn(true)
+      } catch {
+        // Invalid data, clear storage
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+      }
     }
   }, [])
 
-  const handleLogin = (name: string, email: string) => {
-    const userData = { name, email }
+  const handleLogin = (userData: { id?: string; name: string; email: string }, token: string) => {
     setUser(userData)
     setIsLoggedIn(true)
     localStorage.setItem("user", JSON.stringify(userData))
+    localStorage.setItem("token", token)
   }
 
   const handleLogout = () => {
     setUser(null)
     setIsLoggedIn(false)
     localStorage.removeItem("user")
+    localStorage.removeItem("token")
   }
 
   // Sign In handlers
@@ -55,18 +67,34 @@ export default function LandingPage() {
   }
 
   const handleSignInSubmit = async () => {
+    if (!signInData.email || !signInData.password) {
+      setSignInError("Please fill in all fields")
+      return
+    }
+
     setSignInLoading(true)
     setSignInError("")
-    setTimeout(() => {
-      if (signInData.email && signInData.password) {
-        handleLogin("User", signInData.email)
+
+    try {
+      const response = await apiClient.post("/auth/login", {
+        email: signInData.email,
+        password: signInData.password,
+      })
+
+      if (response.data.success) {
+        const { user: userData, token } = response.data.data
+        handleLogin(userData, token)
         setShowSignIn(false)
         setSignInData({ email: "", password: "" })
       } else {
-        setSignInError("Please fill in all fields")
+        setSignInError(response.data.message || "Login failed")
       }
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Login failed. Please try again."
+      setSignInError(message)
+    } finally {
       setSignInLoading(false)
-    }, 1500)
+    }
   }
 
   // Sign Up handlers
@@ -77,18 +105,40 @@ export default function LandingPage() {
   }
 
   const handleSignUpSubmit = async () => {
+    if (!signUpData.email || !signUpData.password || !signUpData.name) {
+      setSignUpError("Please fill in all fields")
+      return
+    }
+
+    if (signUpData.password.length < 6) {
+      setSignUpError("Password must be at least 6 characters long")
+      return
+    }
+
     setSignUpLoading(true)
     setSignUpError("")
-    setTimeout(() => {
-      if (signUpData.email && signUpData.password && signUpData.name) {
-        handleLogin(signUpData.name, signUpData.email)
+
+    try {
+      const response = await apiClient.post("/auth/signup", {
+        name: signUpData.name,
+        email: signUpData.email,
+        password: signUpData.password,
+      })
+
+      if (response.data.success) {
+        const { user: userData, token } = response.data.data
+        handleLogin(userData, token)
         setShowSignUp(false)
         setSignUpData({ name: "", email: "", password: "" })
       } else {
-        setSignUpError("Please fill in all fields")
+        setSignUpError(response.data.message || "Signup failed")
       }
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Signup failed. Please try again."
+      setSignUpError(message)
+    } finally {
       setSignUpLoading(false)
-    }, 1500)
+    }
   }
 
   const handleOAuthClick = (provider: string) => {
@@ -145,7 +195,6 @@ export default function LandingPage() {
         isLoggedIn={isLoggedIn} 
         user={user} 
         onLogout={handleLogout} 
-        onLogin={handleLogin}
         onShowSignIn={() => setShowSignIn(true)}
         onShowSignUp={() => setShowSignUp(true)}
       />
@@ -415,7 +464,16 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <button className="px-8 py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-lg font-semibold hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 flex items-center space-x-2">
+              <button 
+                onClick={() => {
+                  if (isLoggedIn) {
+                    router.push("/solver")
+                  } else {
+                    setShowSignIn(true)
+                  }
+                }}
+                className="px-8 py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-lg font-semibold hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 flex items-center space-x-2"
+              >
                 <span>Start Learning</span>
                 <svg
                   className={`w-5 h-5 transition-transform duration-300 ${isHovered ? "translate-x-1" : ""}`}

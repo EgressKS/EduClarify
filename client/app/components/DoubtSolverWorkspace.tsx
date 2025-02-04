@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useMemoizedFn } from "ahooks"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { StreamingAvatarProvider, StreamingAvatarSessionState } from "./logic"
 import {
   AvatarQuality,
@@ -44,6 +45,7 @@ const DEFAULT_CONFIG = {
 }
 
 function EduClarifyWorkspace() {
+  const router = useRouter()
   const { initAvatar, startAvatar, stopAvatar, sessionState, stream } = useStreamingAvatarSession()
   const { startVoiceChat } = useVoiceChat()
   const { startListening, stopListening } = useConversationState()
@@ -59,12 +61,32 @@ function EduClarifyWorkspace() {
   } | null>(null)
   const [diagramQuery, setDiagramQuery] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState<{ id?: string; name: string; email: string } | null>(null)
 
   const mediaStream = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     setIsLoaded(true)
-  }, [])
+    // Check authentication
+    const token = localStorage.getItem("token")
+    const savedUser = localStorage.getItem("user")
+    if (token && savedUser) {
+      try {
+        const userData = JSON.parse(savedUser)
+        setUser(userData)
+        setIsAuthenticated(true)
+      } catch {
+        // Invalid data - redirect to home
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        router.push("/")
+      }
+    } else {
+      // Not authenticated - redirect to home
+      router.push("/")
+    }
+  }, [router])
 
   async function fetchAccessToken() {
     try {
@@ -200,12 +222,21 @@ function EduClarifyWorkspace() {
           await repeatMessage(data.avatar_script)
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error asking question:", error)
+      
+      // Handle authentication errors
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        router.push("/")
+        return
+      }
+      
       setExplanation({
         avatar_script: "I apologize, but I encountered an error while processing your question. Please try again.",
         text_explanation:
-          "Error: Unable to process your question at the moment. Please check your connection and try again.",
+          error.response?.data?.message || "Error: Unable to process your question at the moment. Please check your connection and try again.",
       })
     } finally {
       setIsProcessing(false)
