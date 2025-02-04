@@ -1,6 +1,6 @@
 import app from './app.js';
 import { ENV } from './config/env.js';
-import { connectDB } from './config/db.js';
+import { connectDB, closeDB } from './config/db.js';
 
 export async function startServer() {
   await connectDB();
@@ -9,12 +9,14 @@ export async function startServer() {
     console.log(`Server running at http://localhost:${ENV.port}`);
   });
 
-  const shutdown = (signal) => {
+  const shutdown = async (signal) => {
     console.log(`Received ${signal}, shutting down server...`);
-    server.close(() => process.exit(0));
+    server.close(async () => {
+      await closeDB();
+      process.exit(0);
+    });
   };
 
   process.on('SIGINT', () => shutdown('SIGINT'));
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
-

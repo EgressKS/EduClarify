@@ -107,7 +107,7 @@ export async function askQuestion(question) {
     throw error;
   }
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   const prompt = `${SYSTEM_PROMPT}
 
 Student Question: "${question}"
@@ -171,4 +171,3 @@ Please provide your response in the exact JSON format specified above.`;
 
   return parsedResponse;
 }
-
