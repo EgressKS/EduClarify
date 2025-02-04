@@ -15,71 +15,58 @@
 
 
 /* ---------- CSS VARIABLES (theme) ---------- */
-/* Primary definition (dark-oriented palette using OKLCH) */
+/* Netflix-style dark palette */
 :root {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.18 0 0);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.5 0.223 265);
-  --primary-foreground: oklch(0.95 0 0);
-  --secondary: oklch(0.22 0 0);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.35 0 0);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.55 0.25 265);
-  --accent-foreground: oklch(0.95 0 0);
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: oklch(0.95 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.22 0 0);
-  --ring: oklch(0.55 0.25 265);
-  --chart-1: oklch(0.55 0.25 265);
-  --chart-2: oklch(0.65 0.2 180);
-  --chart-3: oklch(0.7 0.2 90);
-  --chart-4: oklch(0.6 0.25 45);
-  --chart-5: oklch(0.5 0.2 320);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.18 0 0);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.55 0.25 265);
-  --sidebar-primary-foreground: oklch(0.95 0 0);
-  --sidebar-accent: oklch(0.3 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: oklch(0.55 0.25 265);
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #dc2626;
+  --primary-foreground: #fafafa;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #3f3f46;
+  --muted-foreground: #a1a1aa;
+  --accent: #ef4444;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --destructive-foreground: #fafafa;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #dc2626;
+  --chart-1: #dc2626;
+  --chart-2: #f97316;
+  --chart-3: #eab308;
+  --chart-4: #22c55e;
+  --chart-5: #3b82f6;
+  --radius: 0.5rem;
+  --sidebar: #18181b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #dc2626;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #dc2626;
 
-  /* Fallbacks (for older browsers that do not support OKLCH) */
-  --background-fallback: #1e293b; /* slate-800 */
-  --foreground-fallback: #f8fafc; /* slate-50 */
-  --border-fallback: #334155; /* slate-700 */
+  /* Fallbacks (for older browsers) */
+  --background-fallback: #09090b;
+  --foreground-fallback: #fafafa;
+  --border-fallback: #27272a;
 }
 
-/* Respect prefers-color-scheme: light for users who use system light mode.
-   This provides a light fallback variant that overrides a few values.
-   Keep .dark class-based toggling for explicit theme toggles in JS. */
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #ffffff;
-    --foreground: #0f172a;
-    --card: #ffffff;
-    --card-foreground: #0f172a;
-    --border: #e6edf3;
-    --input: #f8fafc;
-    --muted: #94a3b8;
-  }
-}
-
-/* .dark class will override variables — useful for manual toggles */
-.dark {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.22 0 0);
+/* Always use dark mode for Netflix-style */
+.dark,
+:root {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #dc2626;
 }
 
 /* ---------- Base typographic & global rules ---------- */

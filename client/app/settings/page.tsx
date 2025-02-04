@@ -24,16 +24,16 @@ export default function SettingsPage() {
   const router = useRouter()
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
-  
+
   // Active section for sidebar navigation (based on scroll)
   const [activeSection, setActiveSection] = useState("profile")
-  
+
   // Refs for each section
   const profileRef = useRef<HTMLDivElement>(null)
   const passwordRef = useRef<HTMLDivElement>(null)
   const deleteRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  
+
   // Profile form data (read-only, same as profile page)
   const [formData, setFormData] = useState<ProfileFormData>({
     fullName: "",
@@ -43,7 +43,7 @@ export default function SettingsPage() {
     language: "",
     timeZone: "",
   })
-  
+
   // Password state
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -54,6 +54,11 @@ export default function SettingsPage() {
 
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  // Profile saving state
+  const [profileSaving, setProfileSaving] = useState(false)
+  const [profileSuccess, setProfileSuccess] = useState("")
+  const [profileError, setProfileError] = useState("")
 
   // Intersection Observer for scroll spy
   useEffect(() => {
@@ -91,7 +96,7 @@ export default function SettingsPage() {
       password: passwordRef,
       delete: deleteRef,
     }
-    
+
     const ref = refs[sectionId]
     if (ref?.current) {
       const yOffset = -100
@@ -103,7 +108,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const token = localStorage.getItem("token")
     const userData = localStorage.getItem("user")
-    
+
     if (!token || !userData) {
       router.push("/")
       return
@@ -160,10 +165,46 @@ export default function SettingsPage() {
     router.push("/")
   }
 
+  const handleProfileChange = (field: keyof ProfileFormData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleSaveProfile = async () => {
+    setProfileError("")
+    setProfileSuccess("")
+
+    // Validate required fields
+    if (!formData.fullName.trim()) {
+      setProfileError("Please enter your full name")
+      return
+    }
+
+    setProfileSaving(true)
+
+    try {
+      // Simulate API call (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Update local storage with new name
+      const updatedUser = { ...user, name: formData.fullName }
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+      setUser(updatedUser as UserData)
+      
+      setProfileSuccess("Profile updated successfully!")
+    } catch {
+      setProfileError("Failed to update profile. Please try again.")
+    } finally {
+      setProfileSaving(false)
+    }
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
       </div>
     )
   }
@@ -186,112 +227,169 @@ export default function SettingsPage() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-6 py-8">
         <h1 className="text-2xl font-bold text-white mb-8">Account settings</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content Area - All sections visible */}
           <div className="flex-1 space-y-6">
             {/* Personal Information Section */}
-            <div ref={profileRef} id="profile" className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
+            <div ref={profileRef} id="profile" className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-                <User size={20} className="text-purple-400" />
+                <User size={20} className="text-red-400" />
                 Personal Information
               </h2>
-              
+
+              {profileError && (
+                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  {profileError}
+                </div>
+              )}
+
+              {profileSuccess && (
+                <div className="mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm">
+                  {profileSuccess}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 {/* Full Name */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Full Name</label>
+                  <label className="block text-sm text-zinc-400 mb-2">Full Name</label>
                   <input
                     type="text"
-                    value={formData.fullName || "---"}
-                    readOnly
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-lg text-white cursor-default focus:outline-none"
+                    value={formData.fullName}
+                    onChange={(e) => handleProfileChange("fullName", e.target.value)}
+                    placeholder="Enter your full name"
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                 </div>
 
                 {/* Nick Name */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Nick Name</label>
+                  <label className="block text-sm text-zinc-400 mb-2">Nick Name</label>
                   <input
                     type="text"
-                    value={formData.nickName || "---"}
-                    readOnly
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-lg text-white cursor-default focus:outline-none"
+                    value={formData.nickName}
+                    onChange={(e) => handleProfileChange("nickName", e.target.value)}
+                    placeholder="Enter your nick name"
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                 </div>
 
                 {/* Gender */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                    <User size={14} className="text-slate-500" />
+                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                    <User size={14} className="text-zinc-500" />
                     Gender
                   </label>
-                  <input
-                    type="text"
-                    value={formData.gender || "---"}
-                    readOnly
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-lg text-white cursor-default focus:outline-none"
-                  />
+                  <select
+                    value={formData.gender}
+                    onChange={(e) => handleProfileChange("gender", e.target.value)}
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
                 </div>
 
                 {/* Country */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                    <MapPin size={14} className="text-slate-500" />
+                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                    <MapPin size={14} className="text-zinc-500" />
                     Country
                   </label>
                   <input
                     type="text"
-                    value={formData.country || "---"}
-                    readOnly
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-lg text-white cursor-default focus:outline-none"
+                    value={formData.country}
+                    onChange={(e) => handleProfileChange("country", e.target.value)}
+                    placeholder="Enter your country"
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                 </div>
 
                 {/* Language */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                    <Globe size={14} className="text-slate-500" />
+                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                    <Globe size={14} className="text-zinc-500" />
                     Language
                   </label>
                   <input
                     type="text"
-                    value={formData.language || "---"}
-                    readOnly
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-lg text-white cursor-default focus:outline-none"
+                    value={formData.language}
+                    onChange={(e) => handleProfileChange("language", e.target.value)}
+                    placeholder="Enter your language"
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   />
                 </div>
 
                 {/* Time Zone */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                    <Clock size={14} className="text-slate-500" />
+                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                    <Clock size={14} className="text-zinc-500" />
                     Time Zone
                   </label>
-                  <input
-                    type="text"
-                    value={formData.timeZone || "---"}
-                    readOnly
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-lg text-white cursor-default focus:outline-none"
-                  />
+                  <select
+                    value={formData.timeZone}
+                    onChange={(e) => handleProfileChange("timeZone", e.target.value)}
+                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+                  >
+                    <option value="">Select time zone</option>
+                    <option value="UTC-12:00">UTC-12:00 (Baker Island)</option>
+                    <option value="UTC-11:00">UTC-11:00 (American Samoa)</option>
+                    <option value="UTC-10:00">UTC-10:00 (Hawaii)</option>
+                    <option value="UTC-09:00">UTC-09:00 (Alaska)</option>
+                    <option value="UTC-08:00">UTC-08:00 (Pacific Time)</option>
+                    <option value="UTC-07:00">UTC-07:00 (Mountain Time)</option>
+                    <option value="UTC-06:00">UTC-06:00 (Central Time)</option>
+                    <option value="UTC-05:00">UTC-05:00 (Eastern Time)</option>
+                    <option value="UTC-04:00">UTC-04:00 (Atlantic Time)</option>
+                    <option value="UTC-03:00">UTC-03:00 (Buenos Aires)</option>
+                    <option value="UTC-02:00">UTC-02:00 (Mid-Atlantic)</option>
+                    <option value="UTC-01:00">UTC-01:00 (Azores)</option>
+                    <option value="UTC+00:00">UTC+00:00 (London, GMT)</option>
+                    <option value="UTC+01:00">UTC+01:00 (Paris, Berlin)</option>
+                    <option value="UTC+02:00">UTC+02:00 (Cairo, Jerusalem)</option>
+                    <option value="UTC+03:00">UTC+03:00 (Moscow, Istanbul)</option>
+                    <option value="UTC+04:00">UTC+04:00 (Dubai)</option>
+                    <option value="UTC+05:00">UTC+05:00 (Karachi)</option>
+                    <option value="UTC+05:30">UTC+05:30 (India, Sri Lanka)</option>
+                    <option value="UTC+06:00">UTC+06:00 (Dhaka)</option>
+                    <option value="UTC+07:00">UTC+07:00 (Bangkok, Jakarta)</option>
+                    <option value="UTC+08:00">UTC+08:00 (Singapore, Beijing)</option>
+                    <option value="UTC+09:00">UTC+09:00 (Tokyo, Seoul)</option>
+                    <option value="UTC+10:00">UTC+10:00 (Sydney)</option>
+                    <option value="UTC+11:00">UTC+11:00 (Solomon Islands)</option>
+                    <option value="UTC+12:00">UTC+12:00 (Auckland, Fiji)</option>
+                  </select>
                 </div>
               </div>
 
-              <div className="mt-6">
-                <label className="block text-sm text-slate-400 mb-2">Email</label>
+              <div className="mt-6 mb-3">
+                <label className="block text-sm text-zinc-400 mb-2">Email (Email cannot be changed)</label>
                 <input
                   type="email"
                   value={user.email}
                   readOnly
-                  className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-lg text-slate-400 cursor-default focus:outline-none"
+                  className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-400 cursor-default focus:outline-none"
                 />
               </div>
+
+              {/* Save Button */}
+              <button
+                onClick={handleSaveProfile}
+                disabled={profileSaving}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {profileSaving ? "Saving..." : "Save changes"}
+              </button>
             </div>
 
             {/* Set Password Section */}
-            <div ref={passwordRef} id="password" className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
+            <div ref={passwordRef} id="password" className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-white mb-6">Set password</h2>
 
               {passwordError && (
@@ -308,18 +406,18 @@ export default function SettingsPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Password</label>
+                  <label className="block text-sm text-zinc-400 mb-2">Password</label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12"
+                      className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 pr-12"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -327,18 +425,18 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Confirm password</label>
+                  <label className="block text-sm text-zinc-400 mb-2">Confirm password</label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12"
+                      className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 pr-12"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
                     >
                       {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -347,7 +445,7 @@ export default function SettingsPage() {
 
                 <button
                   onClick={handleSetPassword}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors text-sm"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors text-sm"
                 >
                   Set password
                 </button>
@@ -355,12 +453,12 @@ export default function SettingsPage() {
             </div>
 
             {/* Delete Account Section */}
-            <div ref={deleteRef} id="delete" className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
+            <div ref={deleteRef} id="delete" className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Delete account</h2>
-              <p className="text-slate-400 text-sm mb-4">Before you can delete your account, you need to:</p>
-              
-              <div className="flex items-center gap-2 text-slate-300 mb-6">
-                <div className="w-5 h-5 rounded-full border border-slate-600 flex items-center justify-center">
+              <p className="text-zinc-400 text-sm mb-4">Before you can delete your account, you need to:</p>
+
+              <div className="flex items-center gap-2 text-zinc-300 mb-6">
+                <div className="w-5 h-5 rounded-full border border-zinc-600 flex items-center justify-center">
                   <Check size={12} className="text-green-400" />
                 </div>
                 <span className="text-sm">Leave all organizations</span>
@@ -369,14 +467,14 @@ export default function SettingsPage() {
               {!showDeleteConfirm ? (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors text-sm"
+                  className="px-4 py-2 bg-zinc-700 text-white rounded-lg hover:bg-zinc-600 transition-colors text-sm"
                 >
                   Delete account
                 </button>
               ) : (
                 <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
                   <p className="text-white font-medium mb-2">Are you sure?</p>
-                  <p className="text-sm text-slate-400 mb-4">This action cannot be undone.</p>
+                  <p className="text-sm text-zinc-400 mb-4">This action cannot be undone.</p>
                   <div className="flex gap-3">
                     <button
                       onClick={handleDeleteAccount}
@@ -386,7 +484,7 @@ export default function SettingsPage() {
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
-                      className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-colors text-sm"
+                      className="px-4 py-2 bg-zinc-600 text-white rounded-lg hover:bg-zinc-500 transition-colors text-sm"
                     >
                       Cancel
                     </button>
@@ -404,11 +502,10 @@ export default function SettingsPage() {
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 border-l-2 ${
-                      activeSection === item.id
-                        ? "text-white border-l-blue-500"
-                        : "text-slate-400 border-l-transparent hover:text-white"
-                    }`}
+                    className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 border-l-2 ${activeSection === item.id
+                        ? "text-white border-l-red-500"
+                        : "text-zinc-400 border-l-transparent hover:text-white"
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -417,6 +514,9 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="mt-12">
+        <Footer />
       </div>
     </div>
   )

@@ -271,13 +271,13 @@ function EduClarifyWorkspace() {
   return (
     <div className="min-h-screen bg-gradient-to-br text-white overflow-x-hidden">
       {/* Header */}
-      <header className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700/50 px-5 py-3 sticky top-0 z-40">
+      <header className="bg-zinc-950/80 backdrop-blur-sm border-b border-zinc-800 px-5 py-3 sticky top-0 z-40">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20">
               <span className="text-white font-bold text-xl">D</span>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
               EduClarify AI
             </span>
           </div>
@@ -293,7 +293,7 @@ function EduClarifyWorkspace() {
                 {sessionState === StreamingAvatarSessionState.CONNECTED ? "Connected" : "Disconnected"}
               </span>
             </div>
-            <Link href="/" className="text-slate-300 hover:text-blue-400 font-medium transition-colors duration-200">
+            <Link href="/" className="text-zinc-300 hover:text-red-400 font-medium transition-colors duration-200">
               ← Back to Home
             </Link>
           </div>
@@ -303,13 +303,13 @@ function EduClarifyWorkspace() {
       {/* Main Content */}
       <div className="flex-1 flex h-[calc(100vh-88px)] overflow-hidden">
         {/* Left Panel - Avatar */}
-        <div className="w-1/2 bg-gradient-to-b from-slate-800/50 to-slate-900/50 border-r border-slate-700/50 flex flex-col sticky top-0 h-full">
+        <div className="w-1/2 bg-gradient-to-b from-zinc-900/50 to-zinc-950/50 border-r border-zinc-800 flex flex-col sticky top-0 h-full">
           <div className="flex-1 flex flex-col min-h-0">
             {/* Avatar Display */}
             <div className="flex-1 flex items-center justify-center relative p-8 min-h-0">
               {sessionState !== StreamingAvatarSessionState.INACTIVE ? (
                 <div
-                  className={`w-full h-full bg-slate-800/50 rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/10 border border-slate-700/50 transition-all duration-700 ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+                  className={`w-full h-full bg-zinc-900/50 rounded-2xl overflow-hidden shadow-2xl shadow-red-500/10 border border-zinc-800 transition-all duration-700 ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
                 >
                   <AvatarVideo ref={mediaStream} />
                 </div>
@@ -317,14 +317,14 @@ function EduClarifyWorkspace() {
                 <div
                   className={`text-center transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                 >
-                  <div className="w-32 h-32 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg border border-blue-500/20">
+                  <div className="w-32 h-32 bg-gradient-to-br from-red-500/20 to-orange-600/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg border border-red-500/20">
                     <span className="text-5xl">👨‍🏫</span>
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-3">Your AI Teacher</h3>
-                  <p className="text-slate-400 mb-6">Ready to help you learn!</p>
+                  <p className="text-zinc-400 mb-6">Ready to help you learn!</p>
                   <Button
                     onClick={startSession}
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-lg shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 font-medium"
+                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 rounded-lg shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition-all duration-300 font-medium"
                   >
                     Start Session
                   </Button>
@@ -333,7 +333,7 @@ function EduClarifyWorkspace() {
             </div>
 
             {/* Input Controls */}
-            <div className="flex-shrink-0 pt-8 px-8 pb-4 border-t border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+            <div className="flex-shrink-0 pt-8 px-8 pb-4 border-t border-zinc-800 bg-zinc-950/50 backdrop-blur-sm">
               {sessionState === StreamingAvatarSessionState.CONNECTED ? (
                 <div className="space-y-6">
                   {/* Voice/Text Toggle */}
@@ -343,7 +343,7 @@ function EduClarifyWorkspace() {
                       className={`flex items-center space-x-3 px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg ${
                         isVoiceMode
                           ? "bg-red-500/90 hover:bg-red-600 text-white shadow-red-500/30 hover:shadow-red-500/50"
-                          : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-blue-500/30 hover:shadow-blue-500/50"
+                          : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-red-500/30 hover:shadow-red-500/50"
                       }`}
                     >
                       {isVoiceMode ? <MicOffIcon size={18} /> : <MicIcon size={18} />}
@@ -360,12 +360,12 @@ function EduClarifyWorkspace() {
                       onChange={(e) => setQuestion(e.target.value)}
                       onKeyDown={handleKeyDown}
                       disabled={isProcessing}
-                      className="flex-1 text-slate-100 text-base bg-slate-800/50 border border-slate-700/50 py-3 px-4 rounded-lg outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 disabled:bg-slate-900/50 disabled:text-slate-500 transition-all duration-200 shadow-lg backdrop-blur-sm"
+                      className="flex-1 text-zinc-100 text-base bg-zinc-900/50 border border-zinc-800 py-3 px-4 rounded-lg outline-none focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20 disabled:bg-zinc-950/50 disabled:text-zinc-500 transition-all duration-200 shadow-lg backdrop-blur-sm"
                     />
                     <Button
                       onClick={handleAskQuestion}
                       disabled={!question.trim() || isProcessing}
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-lg shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:shadow-none font-medium"
+                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-lg shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all duration-300 disabled:bg-zinc-600 disabled:cursor-not-allowed disabled:shadow-none font-medium"
                     >
                       {isProcessing ? <LoadingIcon /> : <SendIcon size={18} />}
                     </Button>
@@ -375,18 +375,18 @@ function EduClarifyWorkspace() {
                   <div className="flex justify-center space-x-6 text-sm">
                     {isVoiceMode && (
                       <span
-                        className={`flex items-center space-x-2 ${isListening ? "text-green-400" : "text-slate-400"}`}
+                        className={`flex items-center space-x-2 ${isListening ? "text-green-400" : "text-zinc-400"}`}
                       >
                         <div
                           className={`w-2 h-2 rounded-full ${
-                            isListening ? "bg-green-500 animate-pulse shadow-lg shadow-green-500/50" : "bg-slate-600"
+                            isListening ? "bg-green-500 animate-pulse shadow-lg shadow-green-500/50" : "bg-zinc-600"
                           }`}
                         />
                         <span className="font-medium">{isListening ? "Listening..." : "Voice Ready"}</span>
                       </span>
                     )}
                     {isProcessing && (
-                      <span className="flex items-center space-x-2 text-blue-400 font-medium">
+                      <span className="flex items-center space-x-2 text-red-400 font-medium">
                         <LoadingIcon />
                         <span>Processing...</span>
                       </span>
@@ -394,7 +394,7 @@ function EduClarifyWorkspace() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center text-slate-400">
+                <div className="text-center text-zinc-400">
                   {sessionState === StreamingAvatarSessionState.CONNECTING ? (
                     <div className="flex items-center justify-center space-x-3">
                       <LoadingIcon />
@@ -410,9 +410,9 @@ function EduClarifyWorkspace() {
         </div>
 
         {/* Right Panel - Explanation */}
-        <div className="w-1/2 bg-gradient-to-b from-slate-800/30 to-slate-900/50 flex flex-col overflow-y-auto h-full border-l border-slate-700/50">
+        <div className="w-1/2 bg-gradient-to-b from-zinc-900/30 to-zinc-950/50 flex flex-col overflow-y-auto h-full border-l border-zinc-800">
           <ExplanationPanel explanation={explanation} />
-          <DiagramPanel query={diagramQuery} className="border-t border-slate-700/50 flex-1" onClose={handleResetPanels} />
+          <DiagramPanel query={diagramQuery} className="border-t border-zinc-800 flex-1" onClose={handleResetPanels} />
         </div>
       </div>
     </div>

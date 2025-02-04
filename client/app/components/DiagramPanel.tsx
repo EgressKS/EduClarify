@@ -302,25 +302,25 @@ export default function DiagramPanel({ query, className = "", onClose }: { query
 
   return (
     <div
-      className={`bg-gradient-to-b from-slate-800/30 to-slate-900/50 border-t border-slate-700/50 flex flex-col ${className}`}
+      className={`bg-gradient-to-b from-zinc-900/30 to-zinc-950/50 border-t border-zinc-800 flex flex-col ${className}`}
     >
       <div className="p-6 flex-shrink-0">
         <div
           className={`flex items-center space-x-3 mb-6 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
         >
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20">
             <span className="text-white text-lg">📊</span>
           </div>
           <div>
             <h3 className="text-xl font-semibold text-white">Visual Diagrams</h3>
-            <p className="text-slate-400 text-sm">Relevant visual aids for your question</p>
+            <p className="text-zinc-400 text-sm">Relevant visual aids for your question</p>
           </div>
         </div>
 
         {loading && (
           <div className="flex items-center justify-center py-8">
-            <div className="flex items-center space-x-3 text-slate-400">
-              <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex items-center space-x-3 text-zinc-400">
+              <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
               <span className="font-medium">Loading diagrams...</span>
             </div>
           </div>
@@ -336,11 +336,11 @@ export default function DiagramPanel({ query, className = "", onClose }: { query
         )}
 
         {!loading && !error && items.length === 0 && (
-          <div className="text-center py-8 text-slate-400">
-            <div className="w-16 h-16 bg-slate-700/30 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-700/50">
+          <div className="text-center py-8 text-zinc-400">
+            <div className="w-16 h-16 bg-zinc-800/30 rounded-full flex items-center justify-center mx-auto mb-3 border border-zinc-800">
               <span className="text-2xl">🔍</span>
             </div>
-            <p className="font-medium text-slate-300">No diagrams found</p>
+            <p className="font-medium text-zinc-300">No diagrams found</p>
             <p className="text-sm">Try rephrasing your question</p>
           </div>
         )}
@@ -352,13 +352,13 @@ export default function DiagramPanel({ query, className = "", onClose }: { query
             {items.map((img, i) => (
               <div
                 key={i}
-                className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden shadow-lg hover:shadow-blue-500/20 hover:border-blue-500/50 transition-all duration-300 backdrop-blur-sm"
+                className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden shadow-lg hover:shadow-red-500/20 hover:border-red-500/50 transition-all duration-300 backdrop-blur-sm"
               >
-                <div className="aspect-video bg-slate-900/50 relative overflow-hidden">
+                <div className="aspect-video bg-zinc-950/50 relative overflow-hidden">
                   <img
                     src={img.thumbUrl || "/placeholder.svg"}
                     alt={img.title}
-                    className="w-full h-full object-contain bg-slate-900"
+                    className="w-full h-full object-contain bg-zinc-950"
                     onError={(e) => {
                       const el = e.currentTarget as HTMLImageElement
                       if (el.src !== img.fullUrl) {
@@ -368,11 +368,11 @@ export default function DiagramPanel({ query, className = "", onClose }: { query
                   />
                 </div>
                 <div className="p-4">
-                  <h4 className="font-medium text-slate-100 text-sm mb-3 line-clamp-2 leading-tight">{img.title}</h4>
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
+                  <h4 className="font-medium text-zinc-100 text-sm mb-3 line-clamp-2 leading-tight">{img.title}</h4>
+                  <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
                   </div>
                   <button
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
                     onClick={() => setSelected(img)}
                   >
                     View Full
@@ -394,16 +394,16 @@ export default function DiagramPanel({ query, className = "", onClose }: { query
           }}
         >
           <div
-            className="bg-slate-800/95 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl shadow-black/50 border border-slate-700/50"
+            className="bg-zinc-900/95 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl shadow-black/50 border border-zinc-800"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-6 border-b border-slate-700/50 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
+            <div className="flex items-center justify-between p-6 border-b border-zinc-800 bg-gradient-to-r from-zinc-900/50 to-zinc-950/50">
               <div className="flex-1">
                 <h3 className="font-semibold text-white text-lg">{selected.title}</h3>
-                <p className="text-slate-400 text-sm mt-1">By: {selected.author}</p>
+                <p className="text-zinc-400 text-sm mt-1">By: {selected.author}</p>
               </div>
               <button
-                className="w-8 h-8 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition-colors duration-200"
+                className="w-8 h-8 bg-zinc-800/50 hover:bg-zinc-700/50 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white transition-colors duration-200"
                 onClick={() => {
                   setSelected(null)
                   onClose?.()
@@ -414,7 +414,7 @@ export default function DiagramPanel({ query, className = "", onClose }: { query
             </div>
             <div className="flex flex-col max-h-[calc(90vh-120px)]">
               <div className="flex-1 overflow-y-auto p-6">
-                <div className="flex items-center justify-center bg-slate-900/50 rounded-lg border border-slate-700/50 p-4">
+                <div className="flex items-center justify-center bg-zinc-950/50 rounded-lg border border-zinc-800 p-4">
                   <img
                     src={selected.fullUrl || "/placeholder.svg"}
                     alt={selected.title}
@@ -422,12 +422,12 @@ export default function DiagramPanel({ query, className = "", onClose }: { query
                   />
                 </div>
               </div>
-              <div className="flex-shrink-0 px-6 pb-6 pt-4 border-t border-slate-700/50">
-                <div className="flex items-center justify-between text-sm text-slate-400">
+              <div className="flex-shrink-0 px-6 pb-6 pt-4 border-t border-zinc-800">
+                <div className="flex items-center justify-between text-sm text-zinc-400">
                   <span>License: {selected.license}</span>
                   {selected.licenseUrl && (
                     <a
-                      className="text-blue-400 hover:text-blue-300 font-medium hover:underline transition-colors"
+                      className="text-red-400 hover:text-red-300 font-medium hover:underline transition-colors"
                       target="_blank"
                       rel="noreferrer"
                       href={selected.licenseUrl}

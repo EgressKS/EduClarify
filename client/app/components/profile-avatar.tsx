@@ -18,7 +18,7 @@ export function ProfileAvatar({ name, size = "md" }: ProfileAvatarProps) {
 
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg shadow-purple-500/20`}
+      className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center font-bold text-white shadow-lg shadow-red-500/20`}
     >
       {firstChar}
     </div>

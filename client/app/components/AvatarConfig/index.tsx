@@ -48,9 +48,9 @@ export const AvatarConfig: React.FC<AvatarConfigProps> = ({ onConfigChange, conf
   }, [config.avatarName])
 
   return (
-    <div className="relative flex flex-col gap-4 w-[550px] py-8 max-h-full overflow-y-auto px-4 bg-gradient-to-br from-slate-800/60 to-slate-800/30 rounded-xl border border-slate-700/50 shadow-xl">
-      <div className="mb-4 pb-4 border-b border-slate-700/30">
-        <h2 className="text-lg font-semibold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
+    <div className="relative flex flex-col gap-4 w-[550px] py-8 max-h-full overflow-y-auto px-4 bg-gradient-to-br from-zinc-900/60 to-zinc-900/30 rounded-xl border border-zinc-800 shadow-xl">
+      <div className="mb-4 pb-4 border-b border-zinc-800">
+        <h2 className="text-lg font-semibold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
           Avatar Configuration
         </h2>
       </div>
@@ -120,7 +120,7 @@ export const AvatarConfig: React.FC<AvatarConfigProps> = ({ onConfigChange, conf
       </Field>
       {showMore && (
         <>
-          <h1 className="text-slate-200 w-full text-center mt-6 mb-4 font-semibold">Voice Settings</h1>
+          <h1 className="text-zinc-200 w-full text-center mt-6 mb-4 font-semibold">Voice Settings</h1>
           <Field label="Custom Voice ID">
             <Input
               placeholder="Enter custom voice ID"
@@ -146,7 +146,7 @@ export const AvatarConfig: React.FC<AvatarConfigProps> = ({ onConfigChange, conf
               onSelect={(option) => onChange("voice", { ...config.voice, model: option })}
             />
           </Field>
-          <h1 className="text-slate-200 w-full text-center mt-6 mb-4 font-semibold">STT Settings</h1>
+          <h1 className="text-zinc-200 w-full text-center mt-6 mb-4 font-semibold">STT Settings</h1>
           <Field label="Provider">
             <Select
               isSelected={(option) => option === config.sttSettings?.provider}
@@ -164,7 +164,7 @@ export const AvatarConfig: React.FC<AvatarConfigProps> = ({ onConfigChange, conf
         </>
       )}
       <button
-        className="text-slate-300 text-sm cursor-pointer w-full text-center bg-transparent py-2.5 mt-2 rounded-lg border border-slate-700/30 hover:border-blue-500/50 hover:bg-slate-800/50 hover:text-blue-300 transition-all duration-300 font-medium"
+        className="text-zinc-300 text-sm cursor-pointer w-full text-center bg-transparent py-2.5 mt-2 rounded-lg border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-900/50 hover:text-red-300 transition-all duration-300 font-medium"
         onClick={() => setShowMore(!showMore)}
       >
         {showMore ? "Show less" : "Show more..."}

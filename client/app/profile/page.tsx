@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Camera, MapPin, Globe, Clock, User, Sparkles } from "lucide-react"
-import { Navbar } from "../components/navbar"
+import { Navbar } from "../components/navbar";
+import { Footer } from "../components/footer";
 
 interface UserData {
   id: string
@@ -24,7 +25,7 @@ export default function ProfilePage() {
   const router = useRouter()
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
-  
+
   const [formData, setFormData] = useState<ProfileFormData>({
     fullName: "",
     nickName: "",
@@ -37,7 +38,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const token = localStorage.getItem("token")
     const userData = localStorage.getItem("user")
-    
+
     if (!token || !userData) {
       router.push("/")
       return
@@ -67,8 +68,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
       </div>
     )
   }
@@ -76,7 +77,7 @@ export default function ProfilePage() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-zinc-950">
       <Navbar
         isLoggedIn={true}
         user={user}
@@ -85,27 +86,27 @@ export default function ProfilePage() {
 
       {/* Hero Section with Gradient */}
       <div className="relative">
-        <div className="h-48 bg-gradient-to-br from-violet-600/40 via-purple-500/30 to-blue-600/40 relative overflow-hidden">
+        <div className="h-48 bg-gradient-to-br from-red-600/40 via-orange-500/30 to-red-600/40 relative overflow-hidden">
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.3),transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.3),transparent_50%)]" />
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-950 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-zinc-950 to-transparent" />
         </div>
 
         {/* Profile Card - Overlapping Hero */}
-        <div className="max-w-4xl mx-auto px-6 -mt-24 relative z-10">
-          <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-8 shadow-2xl shadow-purple-500/5">
+        <div className="max-w-5xl mx-auto px-6 -mt-32 relative z-10">
+          <div className="bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/50 rounded-3xl p-8 shadow-2xl shadow-red-500/5">
             <div className="flex flex-col md:flex-row items-center gap-6">
               {/* Avatar with Camera */}
               <div className="relative group">
-                <div className="w-28 h-28 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 p-[3px] shadow-lg shadow-purple-500/25">
-                  <div className="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center">
+                <div className="w-28 h-28 rounded-2xl bg-gradient-to-br from-red-500 via-orange-500 to-red-600 p-[3px] shadow-lg shadow-red-500/25">
+                  <div className="w-full h-full rounded-2xl bg-zinc-900 flex items-center justify-center">
                     <span className="text-4xl font-bold text-white">
                       {user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 </div>
-                <button className="absolute -bottom-2 -right-2 w-9 h-9 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
+                <button className="absolute -bottom-2 -right-2 w-9 h-9 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
                   <Camera size={16} className="text-white" />
                 </button>
               </div>
@@ -114,22 +115,24 @@ export default function ProfilePage() {
               <div className="flex-1 text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                   <h1 className="text-2xl font-bold text-white">{user.name}</h1>
-                  <Sparkles size={18} className="text-purple-400" />
+                  <Sparkles size={18} className="text-red-400" />
                 </div>
-                <p className="text-slate-400">{user.email}</p>
+                <p className="text-gray-400">{user.email}</p>
                 <div className="flex items-center justify-center md:justify-start gap-4 mt-3">
-                  <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+                  <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                     Active
                   </span>
-                  <span className="text-xs text-slate-600">Member since 2024</span>
+                  <span className="text-xs text-gray-600">
+                    Member since {user.createdAt ? new Date(user.createdAt).getFullYear() : new Date().getFullYear()}
+                  </span>
                 </div>
               </div>
 
               {/* Stats or Badge */}
               <div className="hidden md:flex items-center gap-3">
-                <div className="px-4 py-2 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-purple-500/20 rounded-xl">
-                  <span className="text-sm font-medium bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                <div className="px-4 py-2 bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 rounded-xl">
+                  <span className="text-sm font-medium bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
                     Pro Learner
                   </span>
                 </div>
@@ -140,13 +143,13 @@ export default function ProfilePage() {
       </div>
 
       {/* Form Section */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <User size={20} className="text-purple-400" />
+            <User size={20} className="text-red-400" />
             Personal Information
           </h2>
-        
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -240,6 +243,9 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="mt-28">
+        <Footer />
       </div>
     </div>
   )

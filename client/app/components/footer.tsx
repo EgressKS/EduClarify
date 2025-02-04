@@ -5,14 +5,24 @@ import { Mail, Linkedin, Github, Twitter, User, Settings, ChevronUp } from "luci
 import { useEffect, useRef, useState } from "react"
 import { ProfileAvatar } from "./profile-avatar"
 
-interface FooterProps {
-  isLoggedIn?: boolean
-  user?: { id?: string; name: string; email: string } | null
-}
 
-export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
+export function Footer() {
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showScrollTop, setShowScrollTop] = useState(false)
   const userMenuRef = useRef<HTMLDivElement | null>(null)
+
+  // Show/hide scroll to top button based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 100)
+    }
+
+    // Check initial scroll position
+    handleScroll()
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   // Close menu on click outside
   useEffect(() => {
@@ -51,97 +61,37 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-slate-800/40 bg-slate-950/70 backdrop-blur-sm mt-16">
-      <div className="mx-auto px-4 sm:px-6 lg:px-12 ">
-        {/* Footer Top Section (User bar) */}
-        {isLoggedIn && user && (
-          <div className="py-5 border-b border-slate-800/40 flex justify-between items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col">
-                <span className="text-xs uppercase tracking-wide text-slate-500">
-                  Signed in as
-                </span>
-                <span className="text-sm font-medium text-white">
-                  {user.name}
-                </span>
-                <span className="text-xs text-slate-500">{user.email}</span>
-              </div>
-            </div>
+    <>
+      <footer className="border-t border-zinc-800/40 bg-zinc-950 backdrop-blur-sm mt-16">
+        <div className="mx-auto px-4 sm:px-6 lg:px-12">
+        
 
-            <div className="relative" ref={userMenuRef}>
-              <button
-                onClick={() => setShowUserMenu((prev) => !prev)}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-full border border-slate-700/60 bg-slate-900/70 hover:bg-slate-800/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-                aria-haspopup="menu"
-                aria-expanded={showUserMenu}
-                aria-label="User menu"
-              >
-                <ProfileAvatar name={user.name} size="sm" />
-                <span className="hidden sm:inline text-xs text-slate-300">
-                  Account
-                </span>
-              </button>
-
-              {showUserMenu && (
-                <div
-                  className="absolute right-0 mt-3 w-44 bg-slate-900/95 border border-slate-700/70 rounded-xl shadow-2xl overflow-hidden z-20"
-                  role="menu"
-                >
-                  <button
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-slate-100 hover:bg-slate-800/80 transition-colors"
-                    role="menuitem"
-                  >
-                    <User size={16} />
-                    Profile
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-slate-100 hover:bg-slate-800/80 transition-colors"
-                    role="menuitem"
-                  >
-                    <Settings size={16} />
-                    Settings
-                  </button>
-                  <div className="border-t border-slate-700/60" />
-                  <button
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-300 hover:bg-red-950/40 transition-colors"
-                    role="menuitem"
-                  >
-                    {/* Replace with real logout logic */}
-                    <span>Sign out</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        <div className="py-12">
-          <div className="grid gap-10 md:grid-cols-5 mb-10">
-            {/* Brand / About */}
+        <div className="py-8">
+          <div className="grid gap-10 md:grid-cols-5 mb-6">
             <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                  <span className="text-white font-bold text-lg">KS</span>
+              <Link href="/" className="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity w-fit">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-500 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30">
+                  <span className="text-white font-bold text-lg">EC</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-semibold bg-gradient-to-r from-blue-300 via-cyan-300 to-sky-400 bg-clip-text text-transparent text-lg">
+                  <span className="font-semibold bg-gradient-to-r from-red-400 via-orange-400 to-red-500 bg-clip-text text-transparent text-lg">
                     EduClarify
                   </span>
-                  <span className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  <span className="text-[11px] uppercase tracking-[0.18em] text-gray-500">
                     AI-first learning platform
                   </span>
                 </div>
-              </div>
+              </Link>
               {/* SHORT TAGLINE 10–25 CHARACTERS */}
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
                 Personalized AI Learning
               </p>
 
               <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center rounded-full bg-slate-900/80 border border-slate-700/60 px-2.5 py-1 text-[11px] text-slate-300">
+                <span className="inline-flex items-center rounded-full bg-zinc-900/80 border border-zinc-700/60 px-2.5 py-1 text-[11px] text-gray-300">
                   ✨ AI-powered explanations
                 </span>
-                <span className="inline-flex items-center rounded-full bg-slate-900/80 border border-slate-700/60 px-2.5 py-1 text-[11px] text-slate-300">
+                <span className="inline-flex items-center rounded-full bg-zinc-900/80 border border-zinc-700/60 px-2.5 py-1 text-[11px] text-gray-300">
                   📚 Curriculum aligned
                 </span>
               </div>
@@ -156,7 +106,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li className="">
                   <Link
                     href="/features"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     Features
                   </Link>
@@ -164,7 +114,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li>
                   <Link
                     href="/pricing"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     Pricing
                   </Link>
@@ -172,7 +122,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li>
                   <Link
                     href="/demo"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     Live demo
                   </Link>
@@ -180,7 +130,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li>
                   <Link
                     href="/api"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     API access
                   </Link>
@@ -197,7 +147,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li>
                   <Link
                     href="/about"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     About
                   </Link>
@@ -205,7 +155,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li>
                   <Link
                     href="/blog"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     Blog
                   </Link>
@@ -213,7 +163,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li>
                   <Link
                     href="/careers"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     Careers
                   </Link>
@@ -221,7 +171,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <li>
                   <Link
                     href="/contact"
-                    className="text-slate-400 hover:text-blue-400 transition-colors"
+                    className="text-gray-400 hover:text-red-400 transition-colors"
                   >
                     Contact
                   </Link>
@@ -234,7 +184,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
               <h4 className="text-white font-semibold text-sm tracking-wide">
                 Stay in the loop
               </h4>
-              <p className="text-slate-400 text-sm">
+              <p className="text-gray-400 text-sm">
                 Get product updates, study tips, and AI learning insights in
                 your inbox.
               </p>
@@ -246,42 +196,42 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                   type="email"
                   required
                   placeholder="you@example.com"
-                  className="w-full rounded-lg bg-slate-900/80 border border-slate-700/70 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full rounded-lg bg-zinc-900/80 border border-zinc-700/70 px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 transition-colors"
                 >
                   Subscribe
                 </button>
               </form>
 
               <div className="pt-2">
-                <h5 className="text-xs font-semibold text-slate-400 mb-2">
+                <h5 className="text-xs font-semibold text-gray-400 mb-2">
                   Legal
                 </h5>
-                <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-slate-500">
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-gray-500">
                   <Link
                     href="/privacy"
-                    className="hover:text-blue-400 transition-colors"
+                    className="hover:text-red-400 transition-colors"
                   >
                     Privacy
                   </Link>
                   <Link
                     href="/terms"
-                    className="hover:text-blue-400 transition-colors"
+                    className="hover:text-red-400 transition-colors"
                   >
                     Terms
                   </Link>
                   <Link
                     href="/cookies"
-                    className="hover:text-blue-400 transition-colors"
+                    className="hover:text-red-400 transition-colors"
                   >
                     Cookies
                   </Link>
                   <Link
                     href="/support"
-                    className="hover:text-blue-400 transition-colors"
+                    className="hover:text-red-400 transition-colors"
                   >
                     Support
                   </Link>
@@ -291,8 +241,8 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
           </div>
 
           {/* Footer Bottom */}
-          <div className="border-t border-slate-800/40 pt-6 pb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-1 text-sm text-slate-500">
+          <div className="border-t border-zinc-800/40 pt-3 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-1 text-sm text-gray-500">
               <p>&copy; {currentYear} EduClarify AI. All rights reserved.</p>
               <p className="text-xs">
                 Built for students, educators, and life-long learners.
@@ -305,28 +255,28 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
                 <Link
                   href="https://twitter.com"
                   aria-label="EduClarify on Twitter"
-                  className="p-2 rounded-lg border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-blue-400 hover:border-blue-500 transition-colors"
+                  className="p-2 rounded-lg border border-zinc-800 bg-zinc-900/70 text-gray-400 hover:text-red-400 hover:border-red-500 transition-colors"
                 >
                   <Twitter size={18} />
                 </Link>
                 <Link
                   href="https://linkedin.com"
                   aria-label="EduClarify on LinkedIn"
-                  className="p-2 rounded-lg border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-blue-400 hover:border-blue-500 transition-colors"
+                  className="p-2 rounded-lg border border-zinc-800 bg-zinc-900/70 text-gray-400 hover:text-red-400 hover:border-red-500 transition-colors"
                 >
                   <Linkedin size={18} />
                 </Link>
                 <Link
                   href="https://github.com"
                   aria-label="EduClarify on GitHub"
-                  className="p-2 rounded-lg border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-blue-400 hover:border-blue-500 transition-colors"
+                  className="p-2 rounded-lg border border-zinc-800 bg-zinc-900/70 text-gray-400 hover:text-red-400 hover:border-red-500 transition-colors"
                 >
                   <Github size={18} />
                 </Link>
                 <Link
                   href="mailto:hello@educlarify.ai"
                   aria-label="Email EduClarify"
-                  className="p-2 rounded-lg border border-slate-800 bg-slate-900/70 text-slate-400 hover:text-blue-400 hover:border-blue-500 transition-colors"
+                  className="p-2 rounded-lg border border-zinc-800 bg-zinc-900/70 text-gray-400 hover:text-red-400 hover:border-red-500 transition-colors"
                 >
                   <Mail size={18} />
                 </Link>
@@ -336,7 +286,7 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
               <button
                 type="button"
                 onClick={scrollToTop}
-                className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-blue-500 hover:text-blue-300 hover:bg-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700/70 bg-zinc-900/80 px-3 py-1.5 text-xs font-medium text-gray-200 hover:border-red-500 hover:text-red-300 hover:bg-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               >
                 <ChevronUp size={14} />
                 Top
@@ -344,7 +294,22 @@ export function Footer({ isLoggedIn = false, user = null }: FooterProps) {
             </div>
           </div>
         </div>
-      </div>
-    </footer>
+        </div>
+      </footer>
+
+      {/* Floating Back to Top Button */}
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+          }}
+          className="fixed bottom-6 right-6 z-[9999] p-3 rounded-full bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-500/30 hover:from-red-500 hover:to-red-400 hover:shadow-red-500/50 hover:scale-110 transition-all duration-300"
+          aria-label="Back to top"
+        >
+          <ChevronUp size={24} />
+        </button>
+      )}
+    </>
   )
 }

@@ -24,10 +24,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html suppressHydrationWarning className={`${fontSans.variable} ${fontMono.variable} font-sans`} lang="en">
+		<html suppressHydrationWarning className={`${fontSans.variable} ${fontMono.variable} font-sans dark`} lang="en">
 			<head />
-			<body className="min-h-screen bg-black text-white">
-				<main className="relative flex flex-col gap-6 h-screen w-screen">{children}</main>
+			<body className="min-h-screen bg-zinc-950 text-white antialiased">
+				<main className="relative flex flex-col h-screen w-screen">{children}</main>
 			</body>
 		</html>
 	);
