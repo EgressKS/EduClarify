@@ -4,11 +4,19 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Check, User, MapPin, Globe, Clock } from "lucide-react";
 import { Navbar } from "../components/navbar";
 import { Footer } from "../components/footer";
+import { apiClient } from "../lib/http";
 
 interface UserData {
   id: string
   name: string
   email: string
+  nickName?: string
+  gender?: string
+  country?: string
+  language?: string
+  timeZone?: string
+  avatarUrl?: string
+  authProvider?: string
 }
 
 interface ProfileFormData {
@@ -45,15 +53,21 @@ export default function SettingsPage() {
   })
 
   // Password state
+  const [currentPassword, setCurrentPassword] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordError, setPasswordError] = useState("")
   const [passwordSuccess, setPasswordSuccess] = useState("")
+  const [passwordLoading, setPasswordLoading] = useState(false)
 
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deletePassword, setDeletePassword] = useState("")
+  const [deleteError, setDeleteError] = useState("")
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // Profile saving state
   const [profileSaving, setProfileSaving] = useState(false)
@@ -117,10 +131,17 @@ export default function SettingsPage() {
     try {
       const parsed = JSON.parse(userData)
       setUser(parsed)
-      setFormData(prev => ({
-        ...prev,
+      setFormData({
         fullName: parsed.name || "",
-      }))
+        nickName: parsed.nickName || "",
+        gender: parsed.gender || "",
+        country: parsed.country || "",
+        language: parsed.language || "",
+        timeZone: parsed.timeZone || "",
+      })
+      
+      // Fetch latest profile from server
+      fetchProfile()
     } catch {
       router.push("/")
     } finally {
@@ -128,13 +149,35 @@ export default function SettingsPage() {
     }
   }, [router])
 
+  const fetchProfile = async () => {
+    try {
+      const response = await apiClient.get('/auth/profile')
+      if (response.data.success) {
+        const userData = response.data.data.user
+        setUser(userData)
+        setFormData({
+          fullName: userData.name || "",
+          nickName: userData.nickName || "",
+          gender: userData.gender || "",
+          country: userData.country || "",
+          language: userData.language || "",
+          timeZone: userData.timeZone || "",
+        })
+        // Update local storage
+        localStorage.setItem("user", JSON.stringify(userData))
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error)
+    }
+  }
+
   const handleLogout = () => {
     localStorage.removeItem("token")
     localStorage.removeItem("user")
     router.push("/")
   }
 
-  const handleSetPassword = () => {
+  const handleSetPassword = async () => {
     setPasswordError("")
     setPasswordSuccess("")
 
@@ -153,16 +196,55 @@ export default function SettingsPage() {
       return
     }
 
-    // Simulate password change (in real app, call API)
-    setPasswordSuccess("Password set successfully!")
-    setPassword("")
-    setConfirmPassword("")
+    // Check if user has existing password (local auth)
+    const hasExistingPassword = user?.authProvider === 'local' || (user?.authProvider !== 'google')
+
+    if (hasExistingPassword && !currentPassword) {
+      setPasswordError("Current password is required")
+      return
+    }
+
+    setPasswordLoading(true)
+
+    try {
+      const response = await apiClient.put('/auth/password', {
+        currentPassword: hasExistingPassword ? currentPassword : undefined,
+        newPassword: password
+      })
+
+      if (response.data.success) {
+        setPasswordSuccess("Password updated successfully!")
+        setCurrentPassword("")
+        setPassword("")
+        setConfirmPassword("")
+      }
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } }
+      setPasswordError(axiosError.response?.data?.message || "Failed to update password")
+    } finally {
+      setPasswordLoading(false)
+    }
   }
 
-  const handleDeleteAccount = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    router.push("/")
+  const handleDeleteAccount = async () => {
+    setDeleteError("")
+    setDeleteLoading(true)
+
+    try {
+      const response = await apiClient.delete('/auth/account', {
+        data: { password: deletePassword }
+      })
+
+      if (response.data.success) {
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        router.push("/")
+      }
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } }
+      setDeleteError(axiosError.response?.data?.message || "Failed to delete account")
+      setDeleteLoading(false)
+    }
   }
 
   const handleProfileChange = (field: keyof ProfileFormData, value: string) => {
@@ -185,17 +267,24 @@ export default function SettingsPage() {
     setProfileSaving(true)
 
     try {
-      // Simulate API call (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const response = await apiClient.put('/auth/profile', {
+        fullName: formData.fullName,
+        nickName: formData.nickName,
+        gender: formData.gender,
+        country: formData.country,
+        language: formData.language,
+        timeZone: formData.timeZone
+      })
       
-      // Update local storage with new name
-      const updatedUser = { ...user, name: formData.fullName }
-      localStorage.setItem("user", JSON.stringify(updatedUser))
-      setUser(updatedUser as UserData)
-      
-      setProfileSuccess("Profile updated successfully!")
-    } catch {
-      setProfileError("Failed to update profile. Please try again.")
+      if (response.data.success) {
+        const updatedUser = response.data.data.user
+        localStorage.setItem("user", JSON.stringify(updatedUser))
+        setUser(updatedUser as UserData)
+        setProfileSuccess("Profile updated successfully!")
+      }
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } }
+      setProfileError(axiosError.response?.data?.message || "Failed to update profile. Please try again.")
     } finally {
       setProfileSaving(false)
     }
@@ -279,7 +368,7 @@ export default function SettingsPage() {
 
                 {/* Gender */}
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                  <label className="text-sm text-zinc-400 mb-2 flex items-center gap-2">
                     <User size={14} className="text-zinc-500" />
                     Gender
                   </label>
@@ -298,7 +387,7 @@ export default function SettingsPage() {
 
                 {/* Country */}
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                  <label className="text-sm text-zinc-400 mb-2 flex items-center gap-2">
                     <MapPin size={14} className="text-zinc-500" />
                     Country
                   </label>
@@ -313,7 +402,7 @@ export default function SettingsPage() {
 
                 {/* Language */}
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                  <label className="text-sm text-zinc-400 mb-2 flex items-center gap-2">
                     <Globe size={14} className="text-zinc-500" />
                     Language
                   </label>
@@ -328,7 +417,7 @@ export default function SettingsPage() {
 
                 {/* Time Zone */}
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2 flex items-center gap-2">
+                  <label className="text-sm text-zinc-400 mb-2 flex items-center gap-2">
                     <Clock size={14} className="text-zinc-500" />
                     Time Zone
                   </label>
@@ -390,7 +479,9 @@ export default function SettingsPage() {
 
             {/* Set Password Section */}
             <div ref={passwordRef} id="password" className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h2 className="text-lg font-semibold text-white mb-6">Set password</h2>
+              <h2 className="text-lg font-semibold text-white mb-6">
+                {user?.authProvider === 'google' ? 'Set password' : 'Change password'}
+              </h2>
 
               {passwordError && (
                 <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
@@ -405,13 +496,37 @@ export default function SettingsPage() {
               )}
 
               <div className="space-y-4">
+                {/* Current Password - only show if user has local auth */}
+                {user?.authProvider !== 'google' && (
+                  <div>
+                    <label className="block text-sm text-zinc-400 mb-2">Current Password</label>
+                    <div className="relative">
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Enter current password"
+                        className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                      >
+                        {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-2">Password</label>
+                  <label className="block text-sm text-zinc-400 mb-2">New Password</label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter new password"
                       className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 pr-12"
                     />
                     <button
@@ -431,6 +546,7 @@ export default function SettingsPage() {
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
                       className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 pr-12"
                     />
                     <button
@@ -445,9 +561,10 @@ export default function SettingsPage() {
 
                 <button
                   onClick={handleSetPassword}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors text-sm"
+                  disabled={passwordLoading}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Set password
+                  {passwordLoading ? "Updating..." : (user?.authProvider === 'google' ? 'Set password' : 'Update password')}
                 </button>
               </div>
             </div>
@@ -455,14 +572,20 @@ export default function SettingsPage() {
             {/* Delete Account Section */}
             <div ref={deleteRef} id="delete" className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Delete account</h2>
-              <p className="text-zinc-400 text-sm mb-4">Before you can delete your account, you need to:</p>
+              <p className="text-zinc-400 text-sm mb-4">This action is permanent and cannot be undone.</p>
 
               <div className="flex items-center gap-2 text-zinc-300 mb-6">
                 <div className="w-5 h-5 rounded-full border border-zinc-600 flex items-center justify-center">
                   <Check size={12} className="text-green-400" />
                 </div>
-                <span className="text-sm">Leave all organizations</span>
+                <span className="text-sm">All your data will be permanently deleted</span>
               </div>
+
+              {deleteError && (
+                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  {deleteError}
+                </div>
+              )}
 
               {!showDeleteConfirm ? (
                 <button
@@ -474,16 +597,35 @@ export default function SettingsPage() {
               ) : (
                 <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
                   <p className="text-white font-medium mb-2">Are you sure?</p>
-                  <p className="text-sm text-zinc-400 mb-4">This action cannot be undone.</p>
+                  <p className="text-sm text-zinc-400 mb-4">This action cannot be undone. All your data will be permanently deleted.</p>
+                  
+                  {user?.authProvider !== 'google' && (
+                    <div className="mb-4">
+                      <label className="block text-sm text-zinc-400 mb-2">Enter your password to confirm</label>
+                      <input
+                        type="password"
+                        value={deletePassword}
+                        onChange={(e) => setDeletePassword(e.target.value)}
+                        placeholder="Enter your password"
+                        className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+                  )}
+                  
                   <div className="flex gap-3">
                     <button
                       onClick={handleDeleteAccount}
-                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                      disabled={deleteLoading}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Yes, Delete
+                      {deleteLoading ? "Deleting..." : "Yes, Delete"}
                     </button>
                     <button
-                      onClick={() => setShowDeleteConfirm(false)}
+                      onClick={() => {
+                        setShowDeleteConfirm(false)
+                        setDeletePassword("")
+                        setDeleteError("")
+                      }}
                       className="px-4 py-2 bg-zinc-600 text-white rounded-lg hover:bg-zinc-500 transition-colors text-sm"
                     >
                       Cancel

@@ -4,12 +4,20 @@ import { useRouter } from "next/navigation"
 import { Camera, MapPin, Globe, Clock, User, Sparkles } from "lucide-react"
 import { Navbar } from "../components/navbar";
 import { Footer } from "../components/footer";
+import { apiClient } from "../lib/http";
 
 interface UserData {
   id: string
   name: string
   email: string
   createdAt?: string
+  nickName?: string
+  gender?: string
+  country?: string
+  language?: string
+  timeZone?: string
+  avatarUrl?: string
+  authProvider?: string
 }
 
 interface ProfileFormData {
@@ -47,16 +55,45 @@ export default function ProfilePage() {
     try {
       const parsed = JSON.parse(userData)
       setUser(parsed)
-      setFormData(prev => ({
-        ...prev,
+      setFormData({
         fullName: parsed.name || "",
-      }))
+        nickName: parsed.nickName || "",
+        gender: parsed.gender || "",
+        country: parsed.country || "",
+        language: parsed.language || "",
+        timeZone: parsed.timeZone || "",
+      })
+      
+      // Fetch latest profile from server
+      fetchProfile()
     } catch {
       router.push("/")
     } finally {
       setLoading(false)
     }
   }, [router])
+
+  const fetchProfile = async () => {
+    try {
+      const response = await apiClient.get('/auth/profile')
+      if (response.data.success) {
+        const userData = response.data.data.user
+        setUser(userData)
+        setFormData({
+          fullName: userData.name || "",
+          nickName: userData.nickName || "",
+          gender: userData.gender || "",
+          country: userData.country || "",
+          language: userData.language || "",
+          timeZone: userData.timeZone || "",
+        })
+        // Update local storage
+        localStorage.setItem("user", JSON.stringify(userData))
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error)
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("token")
