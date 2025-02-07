@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-const baseUrl =
-  (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000').replace(/\/$/, '');
+// Use explicit backend URL, defaulting to localhost:5000 for local development
+const baseUrl = (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000').replace(/\/$/, '');
+
+console.log('[HTTP Client] Base URL configured as:', baseUrl);
 
 const apiClient = axios.create({
   baseURL: `${baseUrl}/api`,

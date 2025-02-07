@@ -421,7 +421,9 @@ function EduClarifyWorkspace() {
 
 export default function EduClarifyWorkspaceWrapper() {
   return (
-    <StreamingAvatarProvider basePath={process.env.NEXT_PUBLIC_BASE_API_URL}>
+    <StreamingAvatarProvider
+      basePath={process.env.NEXT_PUBLIC_HEYGEN_BASE_URL || "https://api.heygen.com"}
+    >
       <EduClarifyWorkspace />
     </StreamingAvatarProvider>
   )
