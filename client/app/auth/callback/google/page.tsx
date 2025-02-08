@@ -10,12 +10,31 @@ function GoogleCallbackContent() {
   const { handleCallback, isLoading, error } = useGoogleAuth()
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [message, setMessage] = useState("Processing authentication...")
+  const [hasProcessed, setHasProcessed] = useState(false)
 
   useEffect(() => {
+    // Prevent duplicate processing (React 18 Strict Mode runs effects twice)
+    if (hasProcessed) {
+      console.log("Callback already processed, skipping");
+      return;
+    }
+
     const processCallback = async () => {
       const code = searchParams.get("code")
       const state = searchParams.get("state")
       const errorParam = searchParams.get("error")
+
+      console.log("=== OAUTH CALLBACK RECEIVED ===")
+      console.log("Code:", code?.substring(0, 20) + '...')
+      console.log("State:", state)
+      console.log("Error:", errorParam)
+      console.log("Current URL:", window.location.href)
+      
+      // Check what's in storage RIGHT NOW
+      console.log("Storage check on callback:")
+      console.log("- localStorage pkce_data:", !!localStorage.getItem('pkce_data'))
+      console.log("- sessionStorage pkce_state:", !!sessionStorage.getItem('pkce_state'))
+      console.log("- Cookies:", document.cookie)
 
       if (errorParam) {
         setStatus("error")
@@ -28,6 +47,9 @@ function GoogleCallbackContent() {
         setMessage("Missing authentication parameters")
         return
       }
+
+      // Mark as processing to prevent duplicate calls
+      setHasProcessed(true)
 
       try {
         const result = await handleCallback(code, state)
@@ -51,7 +73,7 @@ function GoogleCallbackContent() {
     }
 
     processCallback()
-  }, [searchParams, handleCallback, router, error])
+  }, [searchParams, handleCallback, router, error, hasProcessed])
 
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
@@ -91,6 +113,11 @@ function GoogleCallbackContent() {
             </div>
             <h1 className="text-xl font-semibold text-white mb-2">Authentication Failed</h1>
             <p className="text-gray-400 mb-6">{message}</p>
+            {message.includes("state parameter") && (
+              <p className="text-sm text-gray-500 mb-4">
+                This can happen if you refreshed the page or your session expired. Please try logging in again.
+              </p>
+            )}
             <button
               onClick={() => router.push("/")}
               className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"

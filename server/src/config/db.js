@@ -97,9 +97,10 @@ export async function connectDB() {
   return pool;
 }
 
-export function getDB() {
+export async function getDB() {
   if (!pool) {
-    throw new Error('Database not connected. Call connectDB() first.');
+    console.log('Database not connected, auto-connecting...');
+    await connectDB();
   }
   return pool;
 }

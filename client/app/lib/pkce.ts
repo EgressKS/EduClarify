@@ -44,23 +44,95 @@ export function generateState(): string {
 }
 
 /**
- * Store PKCE data in sessionStorage
+ * Store PKCE data in multiple storage locations for maximum reliability
  */
 export function storePKCEData(codeVerifier: string, state: string): void {
-  sessionStorage.setItem('pkce_code_verifier', codeVerifier);
-  sessionStorage.setItem('pkce_state', state);
+  const data = {
+    codeVerifier,
+    state,
+    timestamp: Date.now()
+  };
+  
+  try {
+    // Store in localStorage (primary - persists across page loads)
+    localStorage.setItem('pkce_data', JSON.stringify(data));
+    localStorage.setItem('pkce_state_only', state);
+    console.log('✓ PKCE data stored in localStorage');
+  } catch (e) {
+    console.warn('✗ localStorage unavailable:', e);
+  }
+  
+  try {
+    // ALSO store in sessionStorage (backup)
+    sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+    sessionStorage.setItem('pkce_state', state);
+    sessionStorage.setItem('pkce_timestamp', Date.now().toString());
+    console.log('✓ PKCE data stored in sessionStorage');
+  } catch (e) {
+    console.warn('✗ sessionStorage unavailable:', e);
+  }
 }
 
 /**
- * Retrieve and clear PKCE data from sessionStorage
+ * Retrieve and clear PKCE data from storage
  */
 export function retrievePKCEData(): { codeVerifier: string | null; state: string | null } {
+  console.log('Retrieving PKCE data...');
+  
+  try {
+    // Try localStorage first
+    const stored = localStorage.getItem('pkce_data');
+    console.log('localStorage data found:', !!stored);
+    
+    if (stored) {
+      const data = JSON.parse(stored);
+      
+      // Check if data is not older than 10 minutes
+      const age = Date.now() - data.timestamp;
+      const isExpired = age > 10 * 60 * 1000;
+      
+      console.log('PKCE data age (seconds):', Math.floor(age / 1000), 'expired:', isExpired);
+      
+      if (!isExpired) {
+        // Clear after retrieval for security
+        localStorage.removeItem('pkce_data');
+        console.log('Retrieved from localStorage:', { hasVerifier: !!data.codeVerifier, hasState: !!data.state });
+        return { codeVerifier: data.codeVerifier, state: data.state };
+      }
+      
+      // Clear expired data
+      localStorage.removeItem('pkce_data');
+      console.warn('PKCE data expired and cleared');
+    }
+  } catch (e) {
+    console.error('Error retrieving from localStorage:', e);
+  }
+  
+  // Fallback to sessionStorage
+  console.log('Falling back to sessionStorage');
   const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
   const state = sessionStorage.getItem('pkce_state');
+  const timestamp = sessionStorage.getItem('pkce_timestamp');
+  
+  console.log('sessionStorage data:', { hasVerifier: !!codeVerifier, hasState: !!state, timestamp });
+  
+  // Check expiry for sessionStorage too
+  if (timestamp) {
+    const age = Date.now() - parseInt(timestamp);
+    const isExpired = age > 10 * 60 * 1000;
+    if (isExpired) {
+      console.warn('sessionStorage PKCE data expired');
+      sessionStorage.removeItem('pkce_code_verifier');
+      sessionStorage.removeItem('pkce_state');
+      sessionStorage.removeItem('pkce_timestamp');
+      return { codeVerifier: null, state: null };
+    }
+  }
   
   // Clear after retrieval for security
   sessionStorage.removeItem('pkce_code_verifier');
   sessionStorage.removeItem('pkce_state');
+  sessionStorage.removeItem('pkce_timestamp');
   
   return { codeVerifier, state };
 }

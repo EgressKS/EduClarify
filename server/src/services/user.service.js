@@ -3,7 +3,7 @@ import { getDB } from '../config/db.js';
 
 export class UserService {
   static async createUser(email, password, name = null, authProvider = 'local', googleId = null) {
-    const db = getDB();
+    const db = await getDB();
 
     // Check if user already exists
     const existingUser = await db.query('SELECT id FROM users WHERE email = $1', [email]);
@@ -29,13 +29,13 @@ export class UserService {
   }
 
   static async findUserByEmail(email) {
-    const db = getDB();
+    const db = await getDB();
     const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     return result.rows[0] || null;
   }
 
   static async findUserById(id) {
-    const db = getDB();
+    const db = await getDB();
     const result = await db.query(
       `SELECT id, email, name, nick_name, gender, country, language, time_zone, 
               avatar_url, google_id, auth_provider, created_at 
@@ -46,7 +46,7 @@ export class UserService {
   }
 
   static async findUserByGoogleId(googleId) {
-    const db = getDB();
+    const db = await getDB();
     const result = await db.query('SELECT * FROM users WHERE google_id = $1', [googleId]);
     return result.rows[0] || null;
   }
@@ -57,7 +57,7 @@ export class UserService {
   }
 
   static async updateUser(id, updates) {
-    const db = getDB();
+    const db = await getDB();
     const fields = [];
     const values = [];
     let paramIndex = 1;
@@ -131,7 +131,7 @@ export class UserService {
   }
 
   static async updatePassword(id, currentPassword, newPassword) {
-    const db = getDB();
+    const db = await getDB();
 
     // Get user to verify current password
     const userResult = await db.query('SELECT password, auth_provider FROM users WHERE id = $1', [id]);
@@ -162,7 +162,7 @@ export class UserService {
   }
 
   static async setPassword(id, newPassword) {
-    const db = getDB();
+    const db = await getDB();
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     
     await db.query(
@@ -174,13 +174,13 @@ export class UserService {
   }
 
   static async deleteUser(id) {
-    const db = getDB();
+    const db = await getDB();
     const result = await db.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
     return result.rows.length > 0;
   }
 
   static async findOrCreateGoogleUser(profile) {
-    const db = getDB();
+    const db = await getDB();
 
     // Check if user exists with this Google ID
     let user = await this.findUserByGoogleId(profile.googleId);
