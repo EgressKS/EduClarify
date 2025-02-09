@@ -32,23 +32,29 @@ EduClarify AI is an interactive AI-powered learning platform that helps students
 ## 📂 Project Structure
 
 ```
-root
-├── client/                    # Next.js frontend
-│   ├── app/                   # Pages & layouts
-│   ├── components/            # Reusable UI components
-│   ├── lib/                   # Helper functions & utilities
-│   └── solver/                # Doubt solver workspace
+EduClarify/
+├── client/                    # Next.js Frontend Application
+│   ├── app/                   # Next.js App Router
+│   │   ├── api/               # API routes
+│   │   ├── auth/              # Authentication pages
+│   │   ├── components/        # React Components
+│   │   ├── lib/               # Utility functions
+│   │   ├── profile/           # Profile page
+│   │   ├── settings/          # Settings page
+│   │   └── solver/            # Doubt solver page
+│   └── package.json
 │
-├── server/                    # Express backend
+├── server/                    # Express Backend API
 │   ├── src/
 │   │   ├── config/            # Configuration files
 │   │   ├── controllers/       # Route controllers
-│   │   ├── middleware/        # Custom middleware
+│   │   ├── middleware/        # Express middleware
 │   │   ├── routes/            # API routes
 │   │   └── services/          # Business logic
-│   └── index.js               # Entry point
+│   └── package.json
 │
-└── README.md                  # Documentation
+├── LICENSE
+└── README.md
 ```
 
 ## 🚀 Setup Instructions
@@ -69,12 +75,38 @@ npm install
 
 ### 2️⃣ Configure Environment Variables
 
-Create `server/.env`:
+**Server (create `server/.env`):**
 ```env
-HEYGEN_API_KEY=your_heygen_api_key
-NEXT_PUBLIC_BASE_API_URL=https://api.heygen.com
-GEMINI_API_KEY=your_gemini_api_key
+# Environment
+NODE_ENV=development
 PORT=5000
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_EXPIRES_IN=7d
+
+# Database
+DATABASE_URL=your_postgresql_connection_string
+
+# Gemini API Key
+GEMINI_API_KEY=your_gemini_api_key
+
+# HeyGen Streaming Avatar API
+HEYGEN_API_KEY=your_heygen_api_key
+
+# Google OAuth 2.0
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback/google
+```
+
+**Client (create `client/.env.local`):**
+```env
+# Google OAuth 2.0
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
+
+# Ready Player Me 3D Avatar
+NEXT_PUBLIC_RPM_AVATAR_URL=your_ready_player_me_avatar_url
 ```
 
 ### 3️⃣ Run the Project
@@ -106,16 +138,6 @@ npm run dev
 5. **Visual Aids** - App extracts keywords from explanation
 6. **Diagram Search** - Searches Wikimedia Commons for relevant diagrams
 7. **Complete Response** - Displays diagrams, explanations, and avatar video
-
-## 🔌 API Endpoints
-
-### Base URL: `http://localhost:5000`
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/ask` | POST | Process a question with Gemini AI |
-| `/api/get-avatar-response` | POST | Generate avatar speech and video |
-| `/api/commons-search` | GET | Search for diagrams on Wikimedia Commons |
 
 ## 🤝 Contributing
 
