@@ -488,7 +488,7 @@ export default function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section - Netflix Style */}
-        <div className="relative min-h-[90vh] flex items-center overflow-hidden">
+        <div className="relative min-h-screen flex items-center overflow-hidden">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-zinc-900" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(220,38,38,0.3),transparent)]" />
@@ -498,14 +498,14 @@ export default function LandingPage() {
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
           
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 w-full">
-            <div className="text-center space-y-8">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+            <div className="text-center space-y-6">
               <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500/10 border border-red-500/30 rounded-full text-sm font-medium text-red-400 backdrop-blur-sm">
                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                 <span>AI-Powered Learning Platform</span>
               </div>
 
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tight">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight">
                 <span className="text-white">Ask Any Doubt,</span>
                 <br />
                 <span className="bg-gradient-to-r from-red-500 via-red-400 to-orange-400 bg-clip-text text-transparent">
@@ -513,12 +513,12 @@ export default function LandingPage() {
                 </span>
               </h1>
 
-              <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
                 Transform the way you learn. Get step-by-step explanations with LaTeX formatting for math, physics,
                 chemistry, and more. Your personal AI teacher is always ready.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
                 <button 
                   onClick={() => {
                     if (isLoggedIn) {
@@ -550,9 +550,9 @@ export default function LandingPage() {
               </div>
 
               {/* Trust indicators */}
-              <div className="pt-12 flex flex-col items-center gap-4">
-                <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">Trusted by students worldwide</p>
-                <div className="flex items-center gap-8">
+              <div className="pt-3 flex flex-col items-center gap-4">
+                <p className="text-xs sm:text-sm text-gray-500 uppercase tracking-wider font-medium">Trusted by students worldwide</p>
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                   <div className="flex -space-x-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-red-600 border-2 border-zinc-900 flex items-center justify-center text-white text-sm font-bold">A</div>
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 border-2 border-zinc-900 flex items-center justify-center text-white text-sm font-bold">B</div>

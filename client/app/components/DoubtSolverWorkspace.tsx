@@ -275,7 +275,7 @@ function EduClarifyWorkspace() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20">
-              <span className="text-white font-bold text-xl">D</span>
+              <span className="text-white font-bold text-xl">EC</span>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
               EduClarify AI
